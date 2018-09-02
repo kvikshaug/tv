@@ -10,6 +10,13 @@ from . import data, tvdb
 logger = logging.getLogger(__name__)
 
 
+def print_table(series):
+    print(tabulate(
+        [[s.id, s.name, s.seen, s.find_available(), s.next_on_air(), s.status, s.category] for s in series],
+        headers=["TVDB ID", "Series", "Last seen", "Available", "Next on air", "Status", "Category"]
+    ))
+
+
 def main():
     if len(sys.argv) == 1:
         command = None
@@ -29,10 +36,7 @@ def main():
             series = [s for s in series if s.category == sys.argv[2]]
         except IndexError:
             pass
-        print(tabulate(
-            [[s.id, s.name, s.seen, s.find_available(), s.next_on_air(), s.category] for s in series],
-            headers=["TVDB ID", "Series", "Last seen", "Available", "Next on air", "Category"]
-        ))
+        print_table(series)
 
     elif command == 'sync':
         series_list = data.load()
@@ -82,10 +86,7 @@ def main():
             exit()
         series.seen = str(seen_episode)
         data.save(series_list)
-        print(tabulate(
-            [[series.id, series.name, series.seen, series.find_available(), series.next_on_air(), series.category]],
-            headers=["TVDB ID", "Series", "Last seen", "Available", "Next on air", "Category"]
-        ))
+        print_table([series])
 
     elif command == 'category':
         series_id = int(sys.argv[2])
@@ -95,10 +96,7 @@ def main():
         series = [s for s in series_list if s.id == series_id][0]
         series.category = category
         data.save(series_list)
-        print(tabulate(
-            [[series.id, series.name, series.seen, series.find_available(), series.next_on_air(), series.category]],
-            headers=["TVDB ID", "Series", "Last seen", "Available", "Next on air", "Category"]
-        ))
+        print_table([series])
 
     else:
         print("""usage: tv [command]
