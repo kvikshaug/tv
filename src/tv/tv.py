@@ -73,7 +73,7 @@ def main():
         series = data.Series.new(series_id)
         series_list.append(series)
         data.save(series_list)
-        print(f"Added series '{series.name}' with default category 'active'")
+        print(f"Added series '{series.name}' with default category '{series.category}'")
 
     elif command == 'seen':
         series_id = int(sys.argv[2])
