@@ -1,5 +1,6 @@
 env/
 .env
 series.json
+series.json.backup
 
 *.pyc

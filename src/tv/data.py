@@ -2,6 +2,7 @@ from datetime import datetime, date
 from functools import total_ordering
 import json
 import re
+import shutil
 
 import logging
 
@@ -148,6 +149,7 @@ def save(series_list):
         'category': s.category,
     } for s in series_list]
     series_serialized = json.dumps(series_dict, indent=4, sort_keys=True)
+    shutil.copyfile('series.json', 'series.json.backup')
     with open('series.json', 'w') as f:
         f.write(series_serialized)
 
