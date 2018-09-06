@@ -1,5 +1,4 @@
 from datetime import datetime, date
-from functools import total_ordering
 import json
 import re
 import shutil
@@ -12,7 +11,6 @@ from . import tvdb
 logger = logging.getLogger(__name__)
 
 
-@total_ordering
 class Series:
     CATEGORIES = ['active', 'waiting', 'default', 'archived']
 
@@ -78,7 +76,6 @@ class Series:
         return series
 
 
-@total_ordering
 class Episode:
     def __init__(self, season, episode, aired=None):
         if not isinstance(season, int):
