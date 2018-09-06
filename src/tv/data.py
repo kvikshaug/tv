@@ -14,6 +14,8 @@ logger = logging.getLogger(__name__)
 
 @total_ordering
 class Series:
+    CATEGORIES = ['active', 'waiting', 'default', 'archived']
+
     def __init__(self, id, name, status, episodes, seen, category):
         self.id = id
         self.name = name
@@ -29,14 +31,7 @@ class Series:
         if self.category == other.category:
             return self.name < other.name
         else:
-            if self.category == 'archived' and other.category in ('default', 'waiting', 'active'):
-                return False
-            elif self.category == 'default' and other.category in ('waiting', 'active'):
-                return False
-            elif self.category == 'waiting' and other.category == 'active':
-                return False
-            else:
-                return True
+            return Series.CATEGORIES.index(self.category) < Series.CATEGORIES.index(other.category)
 
     @property
     def category(self):
@@ -44,7 +39,7 @@ class Series:
 
     @category.setter
     def category(self, value):
-        if value not in ('active', 'waiting', 'default', 'archived'):
+        if value not in Series.CATEGORIES:
             raise ValueError()
         self._category = value
 
