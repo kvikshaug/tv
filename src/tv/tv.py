@@ -17,6 +17,13 @@ def print_table(series):
     ))
 
 
+def identify_series(query, series_list):
+    try:
+        return [s for s in series_list if s.id == int(query)][0]
+    except ValueError:
+        return [s for s in series_list if s.name.lower() == query.lower()][0]
+
+
 def main():
     if len(sys.argv) == 1:
         command = None
@@ -41,14 +48,15 @@ def main():
     elif command == 'sync':
         series_list = data.load()
 
-        try:
-            series_id = int(sys.argv[2])
-            filtered_series = [s for s in series_list if s.id == series_id]
-        except ValueError:
-            category = sys.argv[2]
-            print(f"Filtering by category '{category}'")
-            filtered_series = [s for s in series_list if s.category == category]
-        except IndexError:
+        if len(sys.argv) >= 3:
+            try:
+                query = ' '.join(sys.argv[2:])
+                filtered_series = [identify_series(query, series_list)]
+            except IndexError:
+                category = sys.argv[2]
+                print(f"Filtering by category '{category}'")
+                filtered_series = [s for s in series_list if s.category == category]
+        else:
             filtered_series = series_list
 
         for i, series in enumerate(filtered_series, 1):
@@ -72,11 +80,12 @@ def main():
         print(f"Added series '{series.name}' with default category '{series.category}'")
 
     elif command == 'seen':
-        series_id = int(sys.argv[2])
-        seen_episode_number = sys.argv[3].upper()
-        seen_episode = data.Episode(*data.parse_episode(seen_episode_number))
+        query = ' '.join(sys.argv[2:-1])
         series_list = data.load()
-        series = [s for s in series_list if s.id == series_id][0]
+        series = identify_series(query, series_list)
+
+        seen_episode_number = sys.argv[-1].upper()
+        seen_episode = data.Episode(*data.parse_episode(seen_episode_number))
         if not any([seen_episode == e for e in series.episodes]):
             print(f"{series.name} does not have an episode {seen_episode}")
             exit()
@@ -85,18 +94,18 @@ def main():
         print_table([series])
 
     elif command == 'category':
-        series_id = int(sys.argv[2])
-        category = sys.argv[3]
-
+        query = ' '.join(sys.argv[2:-1])
+        category = sys.argv[-1]
         series_list = data.load()
-        series = [s for s in series_list if s.id == series_id][0]
+        series = identify_series(query, series_list)
+
         series.category = category
         data.save(series_list)
         print_table([series])
 
     elif command == 'episodes':
-        series_id = int(sys.argv[2])
-        series = [s for s in data.load() if s.id == series_id][0]
+        query = ' '.join(sys.argv[2:])
+        series = identify_series(query, data.load())
 
         height = max(e.episode for e in series.episodes)
         width = max(e.season for e in series.episodes)
@@ -112,13 +121,13 @@ def main():
     else:
         print("""usage: tv [command]
 
-    tv sync [category|id]        - sync episode data from thetvdb api
-    tv list [category]           - list tracked series
-    tv episodes <id>             - list episodes in given series
-    tv search <query>            - search for series by name in thetvdb
-    tv add <id>                  - add series to json by tvdb id
-    tv seen <id> <episode>       - set last seen episode on the given series id
-    tv category <id> <category>  - set category on the given series id""")
+    tv sync [category|id/name]        - sync episode data from thetvdb api
+    tv list [category]                - list tracked series
+    tv episodes <id/name>             - list episodes in given series
+    tv search <query>                 - search for series by name in thetvdb
+    tv add <id>                       - add series to json by tvdb id
+    tv seen <id/name> <episode>       - set last seen episode on the given series
+    tv category <id/name> <category>  - set category on the given series""")
 
 
 if __name__ == '__main__':
