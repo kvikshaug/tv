@@ -94,11 +94,27 @@ def main():
         data.save(series_list)
         print_table([series])
 
+    elif command == 'episodes':
+        series_id = int(sys.argv[2])
+        series = [s for s in data.load() if s.id == series_id][0]
+
+        height = max(e.episode for e in series.episodes)
+        width = max(e.season for e in series.episodes)
+        table = [[''] * width for _ in range(height)]
+        for episode in series.episodes:
+            description = f"{episode} ({episode.aired})"
+            if str(episode) == series.seen:
+                description = f"{description} *seen*"
+            table[episode.episode - 1][episode.season - 1] = description
+
+        print(tabulate(table, headers=[f"Season {n + 1}" for n in range(len(table))]))
+
     else:
         print("""usage: tv [command]
 
     tv sync [category|id]        - sync episode data from thetvdb api
     tv list [category]           - list tracked series
+    tv episodes <id>             - list episodes in given series
     tv search <query>            - search for series by name in thetvdb
     tv add <id>                  - add series to json by tvdb id
     tv seen <id> <episode>       - set last seen episode on the given series id
