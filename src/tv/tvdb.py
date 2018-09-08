@@ -3,6 +3,8 @@ import logging
 
 import requests
 
+from . import settings
+
 
 logger = logging.getLogger(__name__)
 TOKEN = None
@@ -12,7 +14,7 @@ def token():
     global TOKEN
     if TOKEN is None:
         logger.info("Authenticating with thetvdb api for JWT")
-        response = requests.post("https://api.thetvdb.com/login", json={"apikey": API_KEY})
+        response = requests.post("https://api.thetvdb.com/login", json={"apikey": settings.API_KEY})
         response.raise_for_status()
         TOKEN = response.json()['token']
     return TOKEN
