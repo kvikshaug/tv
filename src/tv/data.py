@@ -41,16 +41,37 @@ class Series:
             raise ValueError()
         self._category = value
 
-    def synchronize(self):
+    def synchronize(self, output_diff=True):
         series, episodes = tvdb.query_series(self.id)
-        self.id = series['id']
-        self.name = series['seriesName']
-        self.status = series['status']
-        self.episodes = sorted([Episode(
+        new_episodes = sorted([Episode(
             season=int(episode['airedSeason']),
             episode=int(episode['airedEpisodeNumber']),
             aired=datetime.strptime(episode['firstAired'], "%Y-%m-%d").date() if episode['firstAired'] else None,
         ) for episode in episodes])
+
+        if output_diff:
+            if self.id != series['id']:
+                print(f"  ID changed from '{self.id}' to '{series['id']}'")
+            if self.name != series['seriesName']:
+                print(f"  Name changed from '{self.name}' to '{series['seriesName']}'")
+            if self.status != series['status']:
+                print(f"  Status changed from '{self.status}' to '{series['status']}'")
+            for episode in self.episodes:
+                for new_episode in new_episodes:
+                    if episode == new_episode:
+                        if episode.aired != new_episode.aired:
+                            print(f"  {episode} air date changed from {episode.aired} to {new_episode.aired}")
+                        break
+                else:
+                    print(f"  {episode} ({episode.aired}) removed")
+            for new_episode in new_episodes:
+                if new_episode not in self.episodes:
+                    print(f"  {new_episode} ({new_episode.aired}) added")
+
+        self.id = series['id']
+        self.name = series['seriesName']
+        self.status = series['status']
+        self.episodes = new_episodes
 
     def find_available(self):
         if self.seen is None:
@@ -72,7 +93,7 @@ class Series:
     @staticmethod
     def new(id):
         series = Series(id, "", "", [], None, 'default')
-        series.synchronize()
+        series.synchronize(output_diff=False)
         return series
 
 
