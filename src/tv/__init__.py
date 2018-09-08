@@ -25,6 +25,6 @@ logging.config.dictConfig({
     },
     'root': {
         'level': 'DEBUG',
-        'handlers': ['console'],
+        'handlers': [],
     },
 })
