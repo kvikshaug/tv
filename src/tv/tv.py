@@ -43,21 +43,17 @@ def main():
 
         try:
             series_id = int(sys.argv[2])
-            for series in series_list:
-                if series.id == series_id:
-                    print(f"Synchronizing {series.name}")
-                    series.synchronize()
+            filtered_series = [s for s in series_list if s.id == series_id]
         except ValueError:
             category = sys.argv[2]
             print(f"Filtering by category '{category}'")
             filtered_series = [s for s in series_list if s.category == category]
-            for i, series in enumerate(filtered_series, 1):
-                print(f"Synchronizing: {series.name} ({i}/{len(filtered_series)})")
-                series.synchronize()
         except IndexError:
-            for i, series in enumerate(series_list, 1):
-                print(f"Synchronizing: {series.name} ({i}/{len(series_list)})")
-                series.synchronize()
+            filtered_series = series_list
+
+        for i, series in enumerate(filtered_series, 1):
+            print(f"Synchronizing: {series.name} ({i}/{len(filtered_series)})")
+            series.synchronize()
 
         data.save(series_list)
 
