@@ -21,7 +21,7 @@ def identify_series(query, series_list):
     try:
         return [s for s in series_list if s.id == int(query)][0]
     except ValueError:
-        return [s for s in series_list if s.name.lower() == query.lower()][0]
+        return [s for s in series_list if query.lower() in s.name.lower()][0]
 
 
 def main():
