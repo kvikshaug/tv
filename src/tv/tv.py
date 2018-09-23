@@ -85,10 +85,20 @@ def main():
         series = identify_series(query, series_list)
 
         seen_episode_number = sys.argv[-1].upper()
-        seen_episode = data.Episode(*data.parse_episode(seen_episode_number))
+        if seen_episode_number.lower() == 'next':
+            if not series.seen:
+                seen_episode = data.Episode(1, 1)
+            else:
+                seen_episode = data.Episode(*data.parse_episode(series.seen))
+                index = series.episodes.index(seen_episode)
+                seen_episode = series.episodes[index + 1]
+        else:
+            seen_episode = data.Episode(*data.parse_episode(seen_episode_number))
+
         if not any([seen_episode == e for e in series.episodes]):
             print(f"{series.name} does not have an episode {seen_episode}")
             exit()
+
         series.seen = str(seen_episode)
         data.save(series_list)
         print_table([series])
@@ -126,7 +136,7 @@ def main():
     tv episodes <id/name>             - list episodes in given series
     tv search <query>                 - search for series by name in thetvdb
     tv add <id>                       - add series to json by tvdb id
-    tv seen <id/name> <episode>       - set last seen episode on the given series
+    tv seen <id/name> <episode|next>  - set last seen episode on the given series
     tv category <id/name> <category>  - set category on the given series""")
 
 
