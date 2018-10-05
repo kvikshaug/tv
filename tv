@@ -1,5 +1,0 @@
-#!/usr/bin/env sh
-
-source env/bin/activate
-env $(cat .env | xargs) PYTHONPATH=src python -m tv.tv $@
-deactivate

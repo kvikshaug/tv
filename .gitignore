@@ -1,4 +1,5 @@
 env/
+*.egg-info
 .env
 series.json
 series.json.backup
