@@ -1,10 +1,9 @@
-from datetime import datetime, date
 import logging
+from datetime import date, datetime
 
 import requests
 
 from . import settings
-
 
 logger = logging.getLogger(__name__)
 TOKEN = None

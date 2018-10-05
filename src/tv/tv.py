@@ -1,11 +1,10 @@
 import logging
 import sys
 
-from tabulate import tabulate
 import requests
+from tabulate import tabulate
 
 from . import data, tvdb
-
 
 logger = logging.getLogger(__name__)
 

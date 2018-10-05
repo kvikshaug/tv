@@ -1,12 +1,10 @@
-from datetime import datetime, date
 import json
+import logging
 import re
 import shutil
-
-import logging
+from datetime import date, datetime
 
 from . import tvdb
-
 
 logger = logging.getLogger(__name__)
 
