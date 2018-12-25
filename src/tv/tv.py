@@ -1,8 +1,6 @@
 import logging
-import sys
 
 import click
-import requests
 from tabulate import tabulate
 
 from . import data, tvdb
