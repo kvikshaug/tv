@@ -5,3 +5,4 @@ series.json
 series.json.backup
 
 *.pyc
+.python-version
