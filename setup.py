@@ -11,6 +11,6 @@ setup(
     ],
     entry_points="""
         [console_scripts]
-        tv=tv.tv:main
+        tv=tv.tv:cli
     """,
 )
