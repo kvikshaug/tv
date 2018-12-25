@@ -68,7 +68,8 @@ class Series:
                     if episode == new_episode:
                         if episode.aired != new_episode.aired:
                             print(
-                                f"  {episode} air date changed from {episode.aired} to {new_episode.aired}"
+                                f"  {episode} air date changed from {episode.aired} to "
+                                f"{new_episode.aired}"
                             )
                         break
                 else:
