@@ -37,16 +37,17 @@ def search(query):
         print()
 
 @cli.command(help="list tracked series")
-@click.option('-c', '--category', help="filter by category")
-@click.option('-n', '--name', help="filter by series name")
-@click.option('-i', '--id', type=int, help="filter by tvdb id")
-def list(category, name, id):
+@click.option("-a", "--all", is_flag=True, help="ignore filters")
+@click.option("-c", "--category", default="active", help="filter by category (default: active)")
+@click.option("-n", "--name", help="filter by series name")
+@click.option("-i", "--id", type=int, help="filter by tvdb id")
+def list(all, category, name, id):
     series = data.load()
-    if category:
+    if not all and category:
         series = [s for s in series if s.category.lower() == category.lower()]
-    if name:
+    if not all and name:
         series = [s for s in series if name.lower() in s.name.lower()]
-    if id:
+    if not all and id:
         series = [s for s in series if s.id == id]
     print_table(series)
 
