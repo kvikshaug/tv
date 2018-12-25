@@ -5,6 +5,7 @@ setup(
     version="0.0.1",
     py_modules=["tv"],
     install_requires=["click", "requests", "tabulate"],
+    extras_require={"dev": ["black", "flake8", "flake8-bugbear", "isort"]},
     entry_points="""
         [console_scripts]
         tv=tv.tv:cli
