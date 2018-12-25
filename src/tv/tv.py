@@ -1,6 +1,7 @@
 import logging
 import sys
 
+import click
 import requests
 from tabulate import tabulate
 
@@ -23,121 +24,115 @@ def identify_series(query, series_list):
         return [s for s in series_list if query.lower() in s.name.lower()][0]
 
 
-def main():
-    if len(sys.argv) == 1:
-        command = None
-    else:
-        command = sys.argv[1]
+@click.group()
+def cli():
+    pass
 
-    if command == 'search':
-        series_name = ' '.join(sys.argv[2:])
-        for result in tvdb.search(series_name):
-            print(f"{result['id']}: {result['seriesName']} ({result['status']})")
-            print(f"  {result['overview']}")
-            print()
+@cli.command(help="search for series by name in thetvdb")
+@click.argument('query', nargs=-1)
+def search(query):
+    for result in tvdb.search(query):
+        print(f"{result['id']}: {result['seriesName']} ({result['status']})")
+        print(f"  {result['overview']}")
+        print()
 
-    elif command == 'list':
-        series = data.load()
-        try:
-            series = [s for s in series if s.category == sys.argv[2]]
-        except IndexError:
-            pass
-        print_table(series)
+@cli.command(help="list tracked series")
+@click.option('-c', '--category', help="filter by category")
+@click.option('-n', '--name', help="filter by series name")
+@click.option('-i', '--id', type=int, help="filter by tvdb id")
+def list(category, name, id):
+    series = data.load()
+    if category:
+        series = [s for s in series if s.category.lower() == category.lower()]
+    if name:
+        series = [s for s in series if name.lower() in s.name.lower()]
+    if id:
+        series = [s for s in series if s.id == id]
+    print_table(series)
 
-    elif command == 'sync':
-        series_list = data.load()
+@cli.command(help="sync episode data from thetvdb api")
+@click.option('-c', '--category', help="filter by category")
+@click.option('-n', '--name', help="filter by series name")
+@click.option('-i', '--id', type=int, help="filter by tvdb id")
+def sync(category, name, id):
+    series_list = data.load()
+    series_filtered = series_list.copy()
 
-        if len(sys.argv) >= 3:
-            try:
-                query = ' '.join(sys.argv[2:])
-                filtered_series = [identify_series(query, series_list)]
-            except IndexError:
-                category = sys.argv[2]
-                print(f"Filtering by category '{category}'")
-                filtered_series = [s for s in series_list if s.category == category]
+    if category:
+        series_filtered = [s for s in series_filtered if s.category.lower() == category.lower()]
+    if name:
+        series_filtered = [s for s in series_filtered if name.lower() in s.name.lower()]
+    if id:
+        series_filtered = [s for s in series_filtered if s.id == id]
+
+    for i, series in enumerate(series_filtered, 1):
+        print(f"{series.name} ({i}/{len(series_filtered)})")
+        series.synchronize()
+
+    data.save(series_list)
+
+@cli.command(help="add new series")
+@click.argument('series_id', type=int)
+def add(series_id):
+    print(f"Looking up series by id {series_id}")
+
+    series_list = data.load()
+    if any(s.id == series_id for s in series_list):
+        print(f"Series {series_id} is already being tracked")
+        exit()
+
+    series = data.Series.new(series_id)
+    series_list.append(series)
+    data.save(series_list)
+    print(f"Added series {series.name} with default category {series.category}")
+
+@cli.command(help="set last seen episode for given series")
+@click.argument('series', nargs=-1)
+@click.argument('episode')
+def seen(series, episode):
+    series_list = data.load()
+    series = identify_series(' '.join(series), series_list)
+
+    if episode.lower() == 'next':
+        if not series.seen:
+            seen_episode = data.Episode(1, 1)
         else:
-            filtered_series = series_list
-
-        for i, series in enumerate(filtered_series, 1):
-            print(f"Synchronizing: {series.name} ({i}/{len(filtered_series)})")
-            series.synchronize()
-
-        data.save(series_list)
-
-    elif command == 'add':
-        series_id = int(sys.argv[2])
-        print(f"Adding series by id {series_id}")
-
-        series_list = data.load()
-        if any(s.id == series_id for s in series_list):
-            print(f"Series {series_id} is already being tracked")
-            exit()
-
-        series = data.Series.new(series_id)
-        series_list.append(series)
-        data.save(series_list)
-        print(f"Added series '{series.name}' with default category '{series.category}'")
-
-    elif command == 'seen':
-        query = ' '.join(sys.argv[2:-1])
-        series_list = data.load()
-        series = identify_series(query, series_list)
-
-        seen_episode_number = sys.argv[-1].upper()
-        if seen_episode_number.lower() == 'next':
-            if not series.seen:
-                seen_episode = data.Episode(1, 1)
-            else:
-                seen_episode = data.Episode(*data.parse_episode(series.seen))
-                index = series.episodes.index(seen_episode)
-                seen_episode = series.episodes[index + 1]
-        else:
-            seen_episode = data.Episode(*data.parse_episode(seen_episode_number))
-
-        if not any([seen_episode == e for e in series.episodes]):
-            print(f"{series.name} does not have an episode {seen_episode}")
-            exit()
-
-        series.seen = str(seen_episode)
-        data.save(series_list)
-        print_table([series])
-
-    elif command == 'category':
-        query = ' '.join(sys.argv[2:-1])
-        category = sys.argv[-1]
-        series_list = data.load()
-        series = identify_series(query, series_list)
-
-        series.category = category
-        data.save(series_list)
-        print_table([series])
-
-    elif command == 'episodes':
-        query = ' '.join(sys.argv[2:])
-        series = identify_series(query, data.load())
-
-        height = max(e.episode for e in series.episodes)
-        width = max(e.season for e in series.episodes)
-        table = [[''] * width for _ in range(height)]
-        for episode in series.episodes:
-            description = f"{episode} ({episode.aired})"
-            if str(episode) == series.seen:
-                description = f"{description} *seen*"
-            table[episode.episode - 1][episode.season - 1] = description
-
-        print(tabulate(table, headers=[f"Season {n + 1}" for n in range(len(table))]))
-
+            seen_episode = data.Episode(*data.parse_episode(series.seen))
+            index = series.episodes.index(episode)
+            seen_episode = series.episodes[index + 1]
     else:
-        print("""usage: tv [command]
+        seen_episode = data.Episode(*data.parse_episode(episode.upper()))
 
-    tv sync [category|id/name]        - sync episode data from thetvdb api
-    tv list [category]                - list tracked series
-    tv episodes <id/name>             - list episodes in given series
-    tv search <query>                 - search for series by name in thetvdb
-    tv add <id>                       - add series to json by tvdb id
-    tv seen <id/name> <episode|next>  - set last seen episode on the given series
-    tv category <id/name> <category>  - set category on the given series""")
+    if not any([seen_episode == e for e in series.episodes]):
+        print(f"{series.name} does not have an episode {seen_episode}")
+        exit()
 
+    series.seen = str(seen_episode)
+    data.save(series_list)
+    print_table([series])
 
-if __name__ == '__main__':
-    main()
+@cli.command(help="set category for given series")
+@click.argument('series', nargs=-1)
+@click.argument('category')
+def category(series, category):
+    series_list = data.load()
+    series = identify_series(' '.join(series), series_list)
+    series.category = category
+    data.save(series_list)
+    print_table([series])
+
+@cli.command(help="list available episodes for given series")
+@click.argument('series', nargs=-1)
+def episodes(series):
+    series = identify_series(' '.join(series), data.load())
+
+    height = max(e.episode for e in series.episodes)
+    width = max(e.season for e in series.episodes)
+    table = [[''] * width for _ in range(height)]
+    for episode in series.episodes:
+        description = f"{episode} ({episode.aired})"
+        if str(episode) == series.seen:
+            description = f"{description} *seen*"
+        table[episode.episode - 1][episode.season - 1] = description
+
+    print(tabulate(table, headers=[f"Season {n + 1}" for n in range(len(table))]))
