@@ -11,10 +11,31 @@ logger = logging.getLogger(__name__)
 
 
 def print_table(series):
-    print(tabulate(
-        [[s.id, s.name, s.seen, s.find_available(), s.next_on_air(), s.status, s.category] for s in series],
-        headers=["TVDB ID", "Series", "Last seen", "Available", "Next on air", "Status", "Category"]
-    ))
+    print(
+        tabulate(
+            [
+                [
+                    s.id,
+                    s.name,
+                    s.seen,
+                    s.find_available(),
+                    s.next_on_air(),
+                    s.status,
+                    s.category,
+                ]
+                for s in series
+            ],
+            headers=[
+                "TVDB ID",
+                "Series",
+                "Last seen",
+                "Available",
+                "Next on air",
+                "Status",
+                "Category",
+            ],
+        )
+    )
 
 
 def identify_series(query, series_list):
@@ -28,17 +49,21 @@ def identify_series(query, series_list):
 def cli():
     pass
 
+
 @cli.command(help="search for series by name in thetvdb")
-@click.argument('query', nargs=-1)
+@click.argument("query", nargs=-1)
 def search(query):
     for result in tvdb.search(query):
         print(f"{result['id']}: {result['seriesName']} ({result['status']})")
         print(f"  {result['overview']}")
         print()
 
+
 @cli.command(help="list tracked series")
 @click.option("-a", "--all", is_flag=True, help="ignore filters")
-@click.option("-c", "--category", default="active", help="filter by category (default: active)")
+@click.option(
+    "-c", "--category", default="active", help="filter by category (default: active)"
+)
 @click.option("-n", "--name", help="filter by series name")
 @click.option("-i", "--id", type=int, help="filter by tvdb id")
 def list(all, category, name, id):
@@ -51,16 +76,19 @@ def list(all, category, name, id):
         series = [s for s in series if s.id == id]
     print_table(series)
 
+
 @cli.command(help="sync episode data from thetvdb api")
-@click.option('-c', '--category', help="filter by category")
-@click.option('-n', '--name', help="filter by series name")
-@click.option('-i', '--id', type=int, help="filter by tvdb id")
+@click.option("-c", "--category", help="filter by category")
+@click.option("-n", "--name", help="filter by series name")
+@click.option("-i", "--id", type=int, help="filter by tvdb id")
 def sync(category, name, id):
     series_list = data.load()
     series_filtered = series_list.copy()
 
     if category:
-        series_filtered = [s for s in series_filtered if s.category.lower() == category.lower()]
+        series_filtered = [
+            s for s in series_filtered if s.category.lower() == category.lower()
+        ]
     if name:
         series_filtered = [s for s in series_filtered if name.lower() in s.name.lower()]
     if id:
@@ -72,8 +100,9 @@ def sync(category, name, id):
 
     data.save(series_list)
 
+
 @cli.command(help="add new series")
-@click.argument('series_id', type=int)
+@click.argument("series_id", type=int)
 def add(series_id):
     print(f"Looking up series by id {series_id}")
 
@@ -87,14 +116,15 @@ def add(series_id):
     data.save(series_list)
     print(f"Added series {series.name} with default category {series.category}")
 
+
 @cli.command(help="set last seen episode for given series")
-@click.argument('series', nargs=-1)
-@click.argument('episode')
+@click.argument("series", nargs=-1)
+@click.argument("episode")
 def seen(series, episode):
     series_list = data.load()
-    series = identify_series(' '.join(series), series_list)
+    series = identify_series(" ".join(series), series_list)
 
-    if episode.lower() == 'next':
+    if episode.lower() == "next":
         if not series.seen:
             seen_episode = data.Episode(1, 1)
         else:
@@ -112,24 +142,26 @@ def seen(series, episode):
     data.save(series_list)
     print_table([series])
 
+
 @cli.command(help="set category for given series")
-@click.argument('series', nargs=-1)
-@click.argument('category')
+@click.argument("series", nargs=-1)
+@click.argument("category")
 def category(series, category):
     series_list = data.load()
-    series = identify_series(' '.join(series), series_list)
+    series = identify_series(" ".join(series), series_list)
     series.category = category
     data.save(series_list)
     print_table([series])
 
+
 @cli.command(help="list available episodes for given series")
-@click.argument('series', nargs=-1)
+@click.argument("series", nargs=-1)
 def episodes(series):
-    series = identify_series(' '.join(series), data.load())
+    series = identify_series(" ".join(series), data.load())
 
     height = max(e.episode for e in series.episodes)
     width = max(e.season for e in series.episodes)
-    table = [[''] * width for _ in range(height)]
+    table = [[""] * width for _ in range(height)]
     for episode in series.episodes:
         description = f"{episode} ({episode.aired})"
         if str(episode) == series.seen:

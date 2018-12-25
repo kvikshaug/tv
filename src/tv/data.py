@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class Series:
-    CATEGORIES = ['active', 'waiting', 'default', 'archived']
+    CATEGORIES = ["active", "waiting", "default", "archived"]
 
     def __init__(self, id, name, status, episodes, seen, category):
         self.id = id
@@ -27,7 +27,9 @@ class Series:
         if self.category == other.category:
             return self.name < other.name
         else:
-            return Series.CATEGORIES.index(self.category) < Series.CATEGORIES.index(other.category)
+            return Series.CATEGORIES.index(self.category) < Series.CATEGORIES.index(
+                other.category
+            )
 
     @property
     def category(self):
@@ -41,24 +43,33 @@ class Series:
 
     def synchronize(self, output_diff=True):
         series, episodes = tvdb.query_series(self.id)
-        new_episodes = sorted([Episode(
-            season=int(episode['airedSeason']),
-            episode=int(episode['airedEpisodeNumber']),
-            aired=datetime.strptime(episode['firstAired'], "%Y-%m-%d").date() if episode['firstAired'] else None,
-        ) for episode in episodes])
+        new_episodes = sorted(
+            [
+                Episode(
+                    season=int(episode["airedSeason"]),
+                    episode=int(episode["airedEpisodeNumber"]),
+                    aired=datetime.strptime(episode["firstAired"], "%Y-%m-%d").date()
+                    if episode["firstAired"]
+                    else None,
+                )
+                for episode in episodes
+            ]
+        )
 
         if output_diff:
-            if self.id != series['id']:
+            if self.id != series["id"]:
                 print(f"  ID changed from '{self.id}' to '{series['id']}'")
-            if self.name != series['seriesName']:
+            if self.name != series["seriesName"]:
                 print(f"  Name changed from '{self.name}' to '{series['seriesName']}'")
-            if self.status != series['status']:
+            if self.status != series["status"]:
                 print(f"  Status changed from '{self.status}' to '{series['status']}'")
             for episode in self.episodes:
                 for new_episode in new_episodes:
                     if episode == new_episode:
                         if episode.aired != new_episode.aired:
-                            print(f"  {episode} air date changed from {episode.aired} to {new_episode.aired}")
+                            print(
+                                f"  {episode} air date changed from {episode.aired} to {new_episode.aired}"
+                            )
                         break
                 else:
                     print(f"  {episode} ({episode.aired}) removed")
@@ -66,9 +77,9 @@ class Series:
                 if new_episode not in self.episodes:
                     print(f"  {new_episode} ({new_episode.aired}) added")
 
-        self.id = series['id']
-        self.name = series['seriesName']
-        self.status = series['status']
+        self.id = series["id"]
+        self.name = series["seriesName"]
+        self.status = series["status"]
         self.episodes = new_episodes
 
     def find_available(self):
@@ -76,7 +87,11 @@ class Series:
             seen_episode = Episode(0, 0)
         else:
             seen_episode = Episode(*parse_episode(self.seen))
-        available = [e for e in self.episodes if e > seen_episode and e.aired and e.aired <= date.today()]
+        available = [
+            e
+            for e in self.episodes
+            if e > seen_episode and e.aired and e.aired <= date.today()
+        ]
         if not available:
             return "-"
         else:
@@ -90,7 +105,7 @@ class Series:
 
     @staticmethod
     def new(id):
-        series = Series(id, "", "", [], None, 'default')
+        series = Series(id, "", "", [], None, "default")
         series.synchronize(output_diff=False)
         return series
 
@@ -128,19 +143,24 @@ class Episode:
 
 
 def load():
-    with open('series.json') as f:
+    with open("series.json") as f:
         return [
             Series(
-                s['id'],
-                s['name'],
-                s['status'],
-                [Episode(
-                    season=parse_episode(e['episode'])[0],
-                    episode=parse_episode(e['episode'])[1],
-                    aired=datetime.strptime(e['aired'], "%Y-%m-%d").date() if e['aired'] else None,
-                ) for e in s['episodes']],
-                s['seen'],
-                s['category'],
+                s["id"],
+                s["name"],
+                s["status"],
+                [
+                    Episode(
+                        season=parse_episode(e["episode"])[0],
+                        episode=parse_episode(e["episode"])[1],
+                        aired=datetime.strptime(e["aired"], "%Y-%m-%d").date()
+                        if e["aired"]
+                        else None,
+                    )
+                    for e in s["episodes"]
+                ],
+                s["seen"],
+                s["category"],
             )
             for s in json.loads(f.read())
         ]
@@ -148,20 +168,26 @@ def load():
 
 def save(series_list):
     series_list = sorted(series_list)
-    series_dict = [{
-        'id': s.id,
-        'name': s.name,
-        'status': s.status,
-        'episodes': [{
-            'episode': str(e),
-            'aired': e.aired.strftime("%Y-%m-%d") if e.aired else None,
-        } for e in s.episodes],
-        'seen': s.seen,
-        'category': s.category,
-    } for s in series_list]
+    series_dict = [
+        {
+            "id": s.id,
+            "name": s.name,
+            "status": s.status,
+            "episodes": [
+                {
+                    "episode": str(e),
+                    "aired": e.aired.strftime("%Y-%m-%d") if e.aired else None,
+                }
+                for e in s.episodes
+            ],
+            "seen": s.seen,
+            "category": s.category,
+        }
+        for s in series_list
+    ]
     series_serialized = json.dumps(series_dict, indent=4, sort_keys=True)
-    shutil.copyfile('series.json', 'series.json.backup')
-    with open('series.json', 'w') as f:
+    shutil.copyfile("series.json", "series.json.backup")
+    with open("series.json", "w") as f:
         f.write(series_serialized)
 
 
