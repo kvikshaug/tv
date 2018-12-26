@@ -115,43 +115,36 @@ def add(series_id):
     print(f"Added series {series.name} with default category {series.category}")
 
 
-@cli.command(help="set last seen episode for given series")
+@cli.command(help="set properties on the given series")
 @click.argument("series", nargs=-1)
-@click.argument("episode")
-def seen(series, episode):
+@click.option("-c", "--category", help="category")
+@click.option("-s", "--seen", help="last seen episode")
+def set(series, category, seen):
     series_list = data.load()
     series = identify_series(" ".join(series), series_list)
 
-    if episode.lower() == "next":
-        if not series.seen:
-            seen_episode = data.Episode(1, 1)
+    if category:
+        series.category = category
+
+    if seen:
+        if seen.lower() == "next":
+            if not series.seen:
+                seen_episode = data.Episode(1, 1)
+            else:
+                seen_episode = data.Episode(*data.parse_episode(series.seen))
+                index = series.episodes.index(seen_episode)
+                try:
+                    seen_episode = series.episodes[index + 1]
+                except IndexError:
+                    print(f"{seen_episode} is the last episode in {series.name}")
         else:
-            seen_episode = data.Episode(*data.parse_episode(series.seen))
-            index = series.episodes.index(seen_episode)
-            try:
-                seen_episode = series.episodes[index + 1]
-            except IndexError:
-                print(f"{seen_episode} is the last episode in {series.name}")
-                exit()
-    else:
-        seen_episode = data.Episode(*data.parse_episode(episode.upper()))
+            seen_episode = data.Episode(*data.parse_episode(seen.upper()))
 
-    if not any([seen_episode == e for e in series.episodes]):
-        print(f"{series.name} does not have an episode {seen_episode}")
-        exit()
+        if not any([seen_episode == e for e in series.episodes]):
+            print(f"{series.name} does not have an episode {seen_episode}")
+        else:
+            series.seen = str(seen_episode)
 
-    series.seen = str(seen_episode)
-    data.save(series_list)
-    print_table([series])
-
-
-@cli.command(help="set category for given series")
-@click.argument("series", nargs=-1)
-@click.argument("category")
-def category(series, category):
-    series_list = data.load()
-    series = identify_series(" ".join(series), series_list)
-    series.category = category
     data.save(series_list)
     print_table([series])
 
