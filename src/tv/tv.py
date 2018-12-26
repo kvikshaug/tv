@@ -59,13 +59,16 @@ def search(query):
 
 @cli.command(help="list tracked series")
 @click.option("-a", "--all", is_flag=True, help="ignore filters")
-@click.option(
-    "-c", "--category", default="active", help="filter by category (default: active)"
-)
+@click.option("-c", "--category", help="filter by category (default: active)")
 @click.option("-n", "--name", help="filter by series name")
 @click.option("-i", "--id", type=int, help="filter by tvdb id")
 def list(all, category, name, id):
     series = data.load()
+
+    # Default to active category only if no other filters are specified
+    if not any((all, category, name, id)):
+        category = 'active'
+
     if not all and category:
         series = [s for s in series if s.category.lower() == category.lower()]
     if not all and name:
