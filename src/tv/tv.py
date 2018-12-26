@@ -127,8 +127,12 @@ def seen(series, episode):
             seen_episode = data.Episode(1, 1)
         else:
             seen_episode = data.Episode(*data.parse_episode(series.seen))
-            index = series.episodes.index(episode)
-            seen_episode = series.episodes[index + 1]
+            index = series.episodes.index(seen_episode)
+            try:
+                seen_episode = series.episodes[index + 1]
+            except IndexError:
+                print(f"{seen_episode} is the last episode in {series.name}")
+                exit()
     else:
         seen_episode = data.Episode(*data.parse_episode(episode.upper()))
 
