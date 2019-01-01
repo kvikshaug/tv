@@ -4,6 +4,7 @@ import click
 from tabulate import tabulate
 
 from . import data, tvdb
+from .exceptions import SeriesNotFound
 
 logger = logging.getLogger(__name__)
 
@@ -37,10 +38,25 @@ def print_table(series):
 
 
 def identify_series(query, series_list):
+    if query.strip() == "":
+        raise SeriesNotFound()
+
+    if query.isdigit():
+        try:
+            return [s for s in series_list if s.id == int(query)][0]
+        except IndexError:
+            # Continue to string match in the unlikely case that a series is
+            # named with purely digits
+            pass
+
+    # First try exact match
     try:
-        return [s for s in series_list if s.id == int(query)][0]
-    except ValueError:
-        return [s for s in series_list if query.lower() in s.name.lower()][0]
+        return [s for s in series_list if query.lower() == s.name.lower()][0]
+    except IndexError:
+        try:
+            return [s for s in series_list if query.lower() in s.name.lower()][0]
+        except IndexError:
+            raise SeriesNotFound()
 
 
 @click.group()
@@ -123,8 +139,13 @@ def add(series_id):
 @click.option("-c", "--category", help="category")
 @click.option("-s", "--seen", help="last seen episode")
 def set(series, category, seen):
-    series_list = data.load()
-    series = identify_series(" ".join(series), series_list)
+    try:
+        series_list = data.load()
+        query = " ".join(series)
+        series = identify_series(query, series_list)
+    except SeriesNotFound:
+        print(f"Can not find any series with id or name {query}")
+        exit()
 
     if category:
         series.category = category
@@ -155,7 +176,11 @@ def set(series, category, seen):
 @cli.command(help="list available episodes for given series")
 @click.argument("series", nargs=-1)
 def episodes(series):
-    series = identify_series(" ".join(series), data.load())
+    try:
+        query = " ".join(series)
+        series = identify_series(query, data.load())
+    except SeriesNotFound:
+        print(f"Can not find any series with id or name {query}")
 
     height = max(e.episode for e in series.episodes)
     width = max(e.season for e in series.episodes)
