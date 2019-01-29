@@ -173,6 +173,13 @@ def set(series, category, seen):
     print_table([series])
 
 
+@cli.command(help="shortcut to increment seen episode for given series")
+@click.argument("series", nargs=-1)
+@click.pass_context
+def seen(context, series):
+    context.invoke(set, series=series, seen="next")
+
+
 @cli.command(help="list available episodes for given series")
 @click.argument("series", nargs=-1)
 def episodes(series):
