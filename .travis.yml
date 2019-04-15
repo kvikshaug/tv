@@ -8,5 +8,5 @@ install:
 
 script:
   - black src
-  - isort -r src
+  - isort -rc src
   - flake8 src
