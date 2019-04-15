@@ -12,13 +12,14 @@ logger = logging.getLogger(__name__)
 class Series:
     CATEGORIES = ["active", "waiting", "default", "archived"]
 
-    def __init__(self, id, name, status, episodes, seen, category):
+    def __init__(self, id, name, status, episodes, seen, category, language):
         self.id = id
         self.name = name
         self.status = status
         self.episodes = episodes
         self.seen = seen
         self.category = category
+        self.language = language
 
     def __lt__(self, other):
         if not isinstance(other, Series):
@@ -162,6 +163,7 @@ def load():
                 ],
                 s["seen"],
                 s["category"],
+                s["language"],
             )
             for s in json.loads(f.read())
         ]
@@ -183,6 +185,7 @@ def save(series_list):
             ],
             "seen": s.seen,
             "category": s.category,
+            "language": s.language,
         }
         for s in series_list
     ]

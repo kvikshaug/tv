@@ -21,6 +21,7 @@ def print_table(series):
                     s.next_on_air(),
                     s.status,
                     s.category,
+                    s.language,
                 ]
                 for s in series
             ],
@@ -32,6 +33,7 @@ def print_table(series):
                 "Next on air",
                 "Status",
                 "Category",
+                "Language",
             ],
         )
     )
