@@ -140,7 +140,8 @@ def add(series_id):
 @click.argument("series", nargs=-1)
 @click.option("-c", "--category", help="category")
 @click.option("-s", "--seen", help="last seen episode")
-def set(series, category, seen):
+@click.option("-l", "--language", help="language")
+def set(series, category, seen, language):
     try:
         series_list = data.load()
         query = " ".join(series)
@@ -170,6 +171,9 @@ def set(series, category, seen):
             print(f"{series.name} does not have an episode {seen_episode}")
         else:
             series.seen = str(seen_episode)
+
+    if language:
+        series.language = language
 
     data.save(series_list)
     print_table([series])
