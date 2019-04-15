@@ -83,7 +83,7 @@ def list(all, category, name, id):
 
     # Default to active category only if no other filters are specified
     if not any((all, category, name, id)):
-        category = 'active'
+        category = "active"
 
     if not all and category:
         series = [s for s in series if s.category.lower() == category.lower()]
