@@ -57,6 +57,11 @@ class Series:
             ]
         )
 
+        if series["seriesName"] is None:
+            raise ValueError(
+                "Series name is None, expected string. Perhaps wrong language?"
+            )
+
         if output_diff:
             if self.id != series["id"]:
                 print(f"  ID changed from '{self.id}' to '{series['id']}'")
