@@ -122,7 +122,8 @@ def sync(category, name, id):
 
 @cli.command(help="add new series")
 @click.argument("series_id", type=int)
-def add(series_id):
+@click.option("-l", "--language", default="en", help="Language code (default: en)")
+def add(series_id, language):
     print(f"Looking up series by id {series_id}")
 
     series_list = data.load()
@@ -130,7 +131,7 @@ def add(series_id):
         print(f"Series {series_id} is already being tracked")
         exit()
 
-    series = data.Series.new(series_id)
+    series = data.Series.new(series_id, language)
     series_list.append(series)
     data.save(series_list)
     print(f"Added series {series.name} with default category {series.category}")

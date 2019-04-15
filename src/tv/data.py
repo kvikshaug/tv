@@ -111,8 +111,8 @@ class Series:
         return "-"
 
     @staticmethod
-    def new(id):
-        series = Series(id, "", "", [], None, "default")
+    def new(id, language):
+        series = Series(id, "", "", [], None, "default", language)
         series.synchronize(output_diff=False)
         return series
 
