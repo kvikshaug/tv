@@ -43,7 +43,7 @@ class Series:
         self._category = value
 
     def synchronize(self, output_diff=True):
-        series, episodes = tvdb.query_series(self.id)
+        series, episodes = tvdb.query_series(self.id, self.language)
         new_episodes = sorted(
             [
                 Episode(

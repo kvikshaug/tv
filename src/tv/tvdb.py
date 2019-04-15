@@ -20,11 +20,11 @@ def token():
     return TOKEN
 
 
-def query_series(series_id):
+def query_series(series_id, language):
     logger.info(f"{series_id}: Querying series data")
     response = requests.get(
         f"https://api.thetvdb.com/series/{series_id}",
-        headers={"Authorization": f"Bearer {token()}"},
+        headers={"Authorization": f"Bearer {token()}", "Accept-Language": language},
     )
     response.raise_for_status()
     series = response.json()["data"]
@@ -35,7 +35,7 @@ def query_series(series_id):
         logger.info(f"{series_id}: Querying episode data (page {page})")
         response = requests.get(
             f"https://api.thetvdb.com/series/{series_id}/episodes",
-            headers={"Authorization": f"Bearer {token()}"},
+            headers={"Authorization": f"Bearer {token()}", "Accept-Language": language},
             params={"page": page},
         )
         response.raise_for_status()
