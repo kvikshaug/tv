@@ -1,0 +1,12 @@
+language: python
+
+python:
+  - "3.6"
+
+install:
+  - pip install -e ".[dev]"
+
+script:
+  - black src
+  - isort -r src
+  - flake8 src
