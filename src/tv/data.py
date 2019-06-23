@@ -4,7 +4,7 @@ import re
 import shutil
 from datetime import date, datetime
 
-from . import tvdb
+from .tvdb import tvdb
 
 logger = logging.getLogger(__name__)
 

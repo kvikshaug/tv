@@ -3,8 +3,9 @@ import logging
 import click
 from tabulate import tabulate
 
-from . import data, tvdb
+from . import data
 from .exceptions import SeriesNotFound
+from .tvdb import tvdb
 
 logger = logging.getLogger(__name__)
 
@@ -64,6 +65,13 @@ def identify_series(query, series_list):
 @click.group()
 def cli():
     pass
+
+
+@cli.command(help="create the config file with your api key")
+def init():
+    api_key = input(f"Please enter your API key from thetvdb.com: ")
+    tvdb.initialize(api_key)
+    print(f"Thank you. Your API key and login token is saved at: {tvdb.CONFIG_PATH}")
 
 
 @cli.command(help="search for series by name in thetvdb")
