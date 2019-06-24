@@ -9,7 +9,7 @@ By utilizing the exhaustive TV series database at [thetvdb.com](https://www.thet
 Install the package from pypi:
 
 ```
-$ pip install tv
+$ pip install tv-series
 ```
 
 Run `init` to initialize the application. You will be asked for an API key which you can generate on [thetvdb.com](https://www.thetvdb.com/).

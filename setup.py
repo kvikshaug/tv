@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="tv",
+    name="tv-series",
     version="0.0.1",
     author="Ali Kaafarani",
     author_email="ali@kvikshaug.no",
