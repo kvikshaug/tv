@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="tv-series",
-    version="0.0.1",
+    version="1.0.0",
     author="Ali Kaafarani",
     author_email="ali@kvikshaug.no",
     url="https://gitlab.com/kvikshaug/tv",
