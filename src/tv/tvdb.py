@@ -1,6 +1,7 @@
 import base64
 import json
 import logging
+import os
 from datetime import datetime
 
 import requests
@@ -13,6 +14,9 @@ class _TVDBClient:
     CONFIG_PATH = f"{xdg.XDG_CONFIG_HOME}/tv.config.json"
 
     def initialize(self, api_key):
+        if os.path.exists(self.CONFIG_PATH):
+            logger.warning(f"{self.CONFIG_PATH} already exists, not overwriting")
+            return
         self.api_key = api_key
         self.login()
         self.save()
