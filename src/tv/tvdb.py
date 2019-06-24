@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class _TVDBClient:
-    CONFIG_PATH = f"{xdg.XDG_CONFIG_HOME}/tv.json"
+    CONFIG_PATH = f"{xdg.XDG_CONFIG_HOME}/tv.config.json"
 
     def initialize(self, api_key):
         self.api_key = api_key

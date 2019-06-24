@@ -11,7 +11,7 @@ from .tvdb import tvdb
 
 logger = logging.getLogger(__name__)
 
-DATABASE_PATH = f"{xdg.XDG_DATA_HOME}/tv.json"
+DATABASE_PATH = f"{xdg.XDG_DATA_HOME}/tv.series.json"
 
 
 class Series:
