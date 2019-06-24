@@ -154,6 +154,14 @@ class Episode:
             return self.season < other.season
 
 
+def initialize():
+    if os.path.exists(DATABASE_PATH):
+        logger.warning(f"{DATABASE_PATH} already exists, not overwriting")
+        return
+    with open(DATABASE_PATH, "w") as f:
+        json.dump([], f)
+
+
 def load():
     with open(DATABASE_PATH) as f:
         return [
