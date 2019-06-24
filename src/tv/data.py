@@ -1,12 +1,17 @@
 import json
 import logging
+import os
 import re
 import shutil
 from datetime import date, datetime
 
+import xdg
+
 from .tvdb import tvdb
 
 logger = logging.getLogger(__name__)
+
+DATABASE_PATH = f"{xdg.XDG_DATA_HOME}/tv.json"
 
 
 class Series:
@@ -150,7 +155,7 @@ class Episode:
 
 
 def load():
-    with open("series.json") as f:
+    with open(DATABASE_PATH) as f:
         return [
             Series(
                 s["id"],
@@ -195,8 +200,8 @@ def save(series_list):
         for s in series_list
     ]
     series_serialized = json.dumps(series_dict, indent=4, sort_keys=True)
-    shutil.copyfile("series.json", "series.json.backup")
-    with open("series.json", "w") as f:
+    shutil.copyfile(DATABASE_PATH, f"{DATABASE_PATH}.backup")
+    with open(DATABASE_PATH, "w") as f:
         f.write(series_serialized)
 
 

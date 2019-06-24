@@ -71,7 +71,7 @@ def cli():
 def init():
     api_key = input(f"Please enter your API key from thetvdb.com: ")
     tvdb.initialize(api_key)
-    print(f"Thank you. Your API key and login token is saved at: {tvdb.CONFIG_PATH}")
+    print(f"Your API key and login token is saved at: {tvdb.CONFIG_PATH}")
 
 
 @cli.command(help="search for series by name in thetvdb")
