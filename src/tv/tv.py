@@ -69,8 +69,7 @@ def cli():
 
 @cli.command(help="create the config file with your api key")
 def init():
-    api_key = input(f"Please enter your API key from thetvdb.com: ")
-    tvdb.initialize(api_key)
+    tvdb.initialize()
     data.initialize()
     print(f"Your API key and login token is saved at: {tvdb.CONFIG_PATH}")
     print(f"Your TV series database is saved at: {data.DATABASE_PATH}")

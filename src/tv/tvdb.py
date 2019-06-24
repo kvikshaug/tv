@@ -13,11 +13,11 @@ logger = logging.getLogger(__name__)
 class _TVDBClient:
     CONFIG_PATH = f"{xdg.XDG_CONFIG_HOME}/tv.config.json"
 
-    def initialize(self, api_key):
+    def initialize(self):
         if os.path.exists(self.CONFIG_PATH):
             logger.warning(f"{self.CONFIG_PATH} already exists, not overwriting")
             return
-        self.api_key = api_key
+        self.api_key = input(f"Please enter your API key from thetvdb.com: ")
         self.login()
         self.save()
 
