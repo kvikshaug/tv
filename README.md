@@ -63,13 +63,13 @@ $ tv list -a
 
 To read more about the available features, try `tv --help`.
 
-### Data and configuration
+### Files
 
-Data and configuration is stored according to the [XDG base dir spec](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html), i.e., in `$XDG_DATA_HOME` and `$XDG_CONFIG_HOME`, respectively.
+Data and configuration is stored according to the [XDG base dir spec](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html), which usually means `~/.local/share/tv.series.json` and `~/.config/tv.config.json`, respectively.
 
 ## Development
 
-You need Python 3 to work on this project. To install the package and development tools, run:
+Prerequisites: Python 3 and pip. To install development tools, include the `dev` extras:
 
 ```
 $ pip install -e ".[dev]"
@@ -81,8 +81,10 @@ There is currently no test suite. One will likely be added if the codebase grows
 
 ### Code style
 
-The codebase must adhere to the rules of the following formatter rules:
+The source code must adhere to the rules of [Black](https://black.readthedocs.io/en/stable/), [flake8](https://gitlab.com/pycqa/flake8) and [isort](https://github.com/timothycrosley/isort).
 
-* [Black](https://black.readthedocs.io/en/stable/)
-* [flake8](https://gitlab.com/pycqa/flake8)
-* [isort](https://github.com/timothycrosley/isort)
+```
+$ black --check src
+$ flake8 src
+$ isort --recursive --check-only src
+```
