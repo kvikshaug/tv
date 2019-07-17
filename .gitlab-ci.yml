@@ -4,8 +4,11 @@ before_script:
   - pip install -e ".[dev]"
 
 style:
-  stage: test
   script:
-    - black src
-    - isort -rc src
-    - flake8 src
+    - black src tests
+    - isort -rc src tests
+    - flake8 src tests
+
+test:
+  script:
+    - pytest
