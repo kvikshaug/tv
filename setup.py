@@ -15,7 +15,7 @@ setuptools.setup(
     package_dir={"": "src"},
     py_modules=["tv"],
     install_requires=["click", "requests", "tabulate", "xdg"],
-    extras_require={"dev": ["black", "flake8", "flake8-bugbear", "isort"]},
+    extras_require={"dev": ["pytest", "black", "flake8", "flake8-bugbear", "isort"]},
     entry_points="""
         [console_scripts]
         tv=tv.tv:cli
