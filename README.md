@@ -77,14 +77,16 @@ $ pip install -e ".[dev]"
 
 ### Testing
 
-There is currently no test suite. One will likely be added if the codebase grows large or complex enough.
+```
+$ pytest
+```
 
 ### Code style
 
 The source code must adhere to the rules of [Black](https://black.readthedocs.io/en/stable/), [flake8](https://gitlab.com/pycqa/flake8) and [isort](https://github.com/timothycrosley/isort).
 
 ```
-$ black --check src
-$ flake8 src
-$ isort --recursive --check-only src
+$ black --check src tests
+$ flake8 src tests
+$ isort --recursive --check-only src tests
 ```
