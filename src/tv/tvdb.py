@@ -88,6 +88,9 @@ class _TVDBClient:
                 },
                 params={"page": page},
             )
+            if response.status_code == 404 and page == 1:
+                # Likely an upcoming series which has no episodes yet.
+                return series, episodes
             response.raise_for_status()
             result = response.json()
             # Ignore specials with season 0

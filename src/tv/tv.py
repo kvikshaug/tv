@@ -205,6 +205,10 @@ def episodes(series):
     except SeriesNotFound:
         print(f"Can not find any series with id or name {query}")
 
+    if not series.episodes:
+        print(f"{series.name} has no episodes")
+        return
+
     height = max(e.episode for e in series.episodes)
     width = max(e.season for e in series.episodes)
     table = [[""] * width for _ in range(height)]
