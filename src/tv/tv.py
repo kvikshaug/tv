@@ -204,6 +204,7 @@ def episodes(series):
         series = identify_series(query, data.load())
     except SeriesNotFound:
         print(f"Can not find any series with id or name {query}")
+        return
 
     if not series.episodes:
         print(f"{series.name} has no episodes")
