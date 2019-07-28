@@ -78,7 +78,7 @@ def init():
 @cli.command(help="search for series by name in thetvdb")
 @click.argument("query", nargs=-1)
 def search(query):
-    for result in tvdb.search(query):
+    for result in tvdb.search(" ".join(query)):
         print(f"{result['id']}: {result['seriesName']} ({result['status']})")
         print(f"  {result['overview']}")
         print()
