@@ -40,28 +40,6 @@ def print_table(series):
     )
 
 
-def identify_series(query, series_list):
-    if query.strip() == "":
-        raise SeriesNotFound()
-
-    if query.isdigit():
-        try:
-            return [s for s in series_list if s.id == int(query)][0]
-        except IndexError:
-            # Continue to string match in the unlikely case that a series is
-            # named with purely digits
-            pass
-
-    # First try exact match
-    try:
-        return [s for s in series_list if query.lower() == s.name.lower()][0]
-    except IndexError:
-        try:
-            return [s for s in series_list if query.lower() in s.name.lower()][0]
-        except IndexError:
-            raise SeriesNotFound()
-
-
 @click.group()
 def cli():
     pass
@@ -155,7 +133,7 @@ def set(series, category, seen, language):
     try:
         series_list = data.load()
         query = " ".join(series)
-        series = identify_series(query, series_list)
+        series = data.identify_series(query, series_list)
     except SeriesNotFound:
         print(f"Can not find any series with id or name {query}")
         exit()
@@ -201,7 +179,7 @@ def seen(context, series):
 def episodes(series):
     try:
         query = " ".join(series)
-        series = identify_series(query, data.load())
+        series = data.identify_series(query, data.load())
     except SeriesNotFound:
         print(f"Can not find any series with id or name {query}")
         return

@@ -7,6 +7,7 @@ from datetime import date, datetime
 
 import xdg
 
+from .exceptions import SeriesNotFound
 from .tvdb import tvdb
 
 logger = logging.getLogger(__name__)
@@ -216,3 +217,25 @@ def save(series_list):
 def parse_episode(episode_number):
     m = re.match(r"S(\d+)E(\d+)", episode_number.upper())
     return int(m.group(1)), int(m.group(2))
+
+
+def identify_series(query, series_list):
+    if query.strip() == "":
+        raise SeriesNotFound()
+
+    if query.isdigit():
+        try:
+            return [s for s in series_list if s.id == int(query)][0]
+        except IndexError:
+            # Continue to string match in the unlikely case that a series is
+            # named with purely digits
+            pass
+
+    # First try exact match
+    try:
+        return [s for s in series_list if query.lower() == s.name.lower()][0]
+    except IndexError:
+        try:
+            return [s for s in series_list if query.lower() in s.name.lower()][0]
+        except IndexError:
+            raise SeriesNotFound()
