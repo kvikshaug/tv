@@ -14,7 +14,7 @@ setuptools.setup(
     packages=setuptools.find_packages(where="src"),
     package_dir={"": "src"},
     py_modules=["tv"],
-    install_requires=["click", "requests", "tabulate", "xdg"],
+    install_requires=["click", "requests", "tabulate", "xdg", "fuzzywuzzy"],
     extras_require={"dev": ["pytest", "black", "flake8", "flake8-bugbear", "isort"]},
     entry_points="""
         [console_scripts]
