@@ -136,7 +136,7 @@ def set(series, category, seen, language):
         series = data.identify_series(query, series_list)
     except SeriesNotFound:
         print(f"Can not find any series with id or name {query}")
-        exit()
+        return
 
     if category:
         series.category = category
@@ -152,11 +152,13 @@ def set(series, category, seen, language):
                     seen_episode = series.episodes[index + 1]
                 except IndexError:
                     print(f"{seen_episode} is the last episode in {series.name}")
+                    return
         else:
             seen_episode = data.Episode(*data.parse_episode(seen.upper()))
 
         if not any([seen_episode == e for e in series.episodes]):
             print(f"{series.name} does not have an episode {seen_episode}")
+            return
         else:
             series.seen = str(seen_episode)
 
