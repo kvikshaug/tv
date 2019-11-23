@@ -139,7 +139,11 @@ def set(series, category, seen, language):
         return
 
     if category:
+        old_category = series.category
         series.category = category
+        print(
+            f"{series.name}: Category changed from {old_category} to {series.category}"
+        )
 
     if seen:
         if seen.lower() == "next":
@@ -160,13 +164,20 @@ def set(series, category, seen, language):
             print(f"{series.name} does not have an episode {seen_episode}")
             return
         else:
+            old_seen = series.seen
             series.seen = str(seen_episode)
+            print(
+                f"{series.name}: Seen episode changed from {old_seen} to {series.seen}"
+            )
 
     if language:
+        old_language = series.language
         series.language = language
+        print(
+            f"{series.name}: Language changed from {old_language} to {series.language}"
+        )
 
     data.save(series_list)
-    print_table([series])
 
 
 @cli.command(help="shortcut to increment seen episode for given series")
