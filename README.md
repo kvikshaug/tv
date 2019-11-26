@@ -1,8 +1,10 @@
 # tv
 
-tv is a lightweight CLI application that helps you manage your favorite TV series.
+tv is a lightweight CLI application that helps you keep an overview of your favorite TV series.
 
 By utilizing the exhaustive TV series database at [thetvdb.com](https://www.thetvdb.com/), the client lets you manage and categorize a list of your favorite tv series, keep track of which episodes you've seen, and see when the next episode is airing.
+
+Note that tv does not read or handle files or directories, or integrate with any media center. Rather, it is a standalone application to compliment your existing media experience.
 
 ## Getting started
 
